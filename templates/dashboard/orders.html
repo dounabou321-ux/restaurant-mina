@@ -1,0 +1,214 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block title %}Commandes - Dashboard{% endblock %}
+
+{% block dashboard_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">Gestion des Commandes</h2>
+    <button class="btn btn-primary" onclick="location.reload()">
+        <i class="bi bi-arrow-clockwise"></i> Actualiser
+    </button>
+</div>
+
+<!-- Stats -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="text-muted mb-0">En attente</p>
+                    <h3 class="mb-0" id="statPending">0</h3>
+                </div>
+                <div class="stat-icon" style="background: #fff3cd; color: #856404;">
+                    <i class="bi bi-clock"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="text-muted mb-0">En préparation</p>
+                    <h3 class="mb-0" id="statPreparing">0</h3>
+                </div>
+                <div class="stat-icon" style="background: #cff4fc; color: #055160;">
+                    <i class="bi bi-fire"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="text-muted mb-0">Prêtes</p>
+                    <h3 class="mb-0" id="statReady">0</h3>
+                </div>
+                <div class="stat-icon" style="background: #d1e7dd; color: #0f5132;">
+                    <i class="bi bi-bell"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="text-muted mb-0">Total aujourd'hui</p>
+                    <h3 class="mb-0">{{ orders|length }}</h3>
+                </div>
+                <div class="stat-icon" style="background: #f8d7da; color: #842029;">
+                    <i class="bi bi-receipt"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Orders Table -->
+<div class="card shadow-sm">
+    <div class="card-header bg-white py-3">
+        <h5 class="mb-0">Toutes les commandes</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Commande</th>
+                        <th>Table</th>
+                        <th>Articles</th>
+                        <th>Total</th>
+                        <th>Statut</th>
+                        <th>Heure</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>
+                            <strong>{{ order.order_id }}</strong>
+                        </td>
+                        <td>
+                            <span class="badge bg-dark">Table {{ order.table_number }}</span>
+                        </td>
+                        <td>
+                            {% for item in order.items %}
+                            <span class="badge bg-secondary me-1">{{ item.name }} x{{ item.quantity }}</span>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            <strong>{{ order.total_amount }} MAD</strong>
+                        </td>
+                        <td>
+                            <select class="form-select form-select-sm status-select" 
+                                    data-order-id="{{ order.order_id }}"
+                                    style="width: auto; min-width: 140px;">
+                                <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>En attente</option>
+                                <option value="preparing" {% if order.status == 'preparing' %}selected{% endif %}>En préparation</option>
+                                <option value="ready" {% if order.status == 'ready' %}selected{% endif %}>Prêt</option>
+                                <option value="served" {% if order.status == 'served' %}selected{% endif %}>Servi</option>
+                                <option value="paid" {% if order.status == 'paid' %}selected{% endif %}>Payé</option>
+                            </select>
+                        </td>
+                        <td>
+                            <small class="text-muted">{{ order.created_at|date:"H:i" }}</small>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteOrder('{{ order.order_id }}')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4">
+                            <i class="bi bi-inbox display-4 text-muted"></i>
+                            <p class="mt-2 text-muted">Aucune commande</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function updateStats() {
+    const selects = document.querySelectorAll('.status-select');
+    let pending = 0, preparing = 0, ready = 0;
+    
+    selects.forEach(select => {
+        const status = select.value;
+        if (status === 'pending') pending++;
+        else if (status === 'preparing') preparing++;
+        else if (status === 'ready') ready++;
+    });
+    
+    document.getElementById('statPending').textContent = pending;
+    document.getElementById('statPreparing').textContent = preparing;
+    document.getElementById('statReady').textContent = ready;
+}
+
+document.querySelectorAll('.status-select').forEach(select => {
+    select.addEventListener('change', function() {
+        const orderId = this.getAttribute('data-order-id');
+        const newStatus = this.value;
+        
+        fetch('{% url "update_order_status" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                order_id: orderId,
+                status: newStatus
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateStats();
+                const toast = document.createElement('div');
+                toast.className = 'position-fixed bottom-0 end-0 p-3';
+                toast.innerHTML = `
+                    <div class="toast show" role="alert">
+                        <div class="toast-header bg-success text-white">
+                            <strong class="me-auto">Succès</strong>
+                        </div>
+                        <div class="toast-body">Statut mis à jour</div>
+                    </div>
+                `;
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 3000);
+            }
+        });
+    });
+});
+
+updateStats();
+
+function deleteOrder(orderId) {
+    if (!confirm('Voulez-vous supprimer cette commande?')) return;
+    fetch('{% url "delete_order" %}', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}'},
+        body: JSON.stringify({order_id: orderId})
+    })
+    .then(r => r.json())
+    .then(d => {
+        if (d.success) {
+            document.querySelector('[data-order-id="' + orderId + '"]').closest('tr').remove();
+            updateStats();
+        } else alert('Erreur: ' + d.error);
+    })
+    .catch(() => alert('Erreur'));
+}
+</script>
+{% endblock %}

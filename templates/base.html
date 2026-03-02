@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Mama's Mina - Restaurant Marocain{% endblock %}</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Nunito:wght@300;400;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <style>
+        :root {
+            --primary: #9C4221;
+            --secondary: #5D8AA8;
+            --accent: #D4AF37;
+            --background: #FAF8F5;
+            --text-primary: #2C1810;
+            --text-secondary: #6B5B4F;
+            --card-bg: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--background);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .logo-text {
+            font-family: 'Cinzel Decorative', cursive;
+            color: var(--primary);
+        }
+
+        /* Navbar */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary) 0%, #7A3419 100%);
+            box-shadow: 0 4px 20px rgba(156, 66, 33, 0.3);
+        }
+
+        .navbar-brand {
+            font-family: 'Cinzel Decorative', cursive;
+            font-size: 1.5rem;
+            color: var(--accent) !important;
+        }
+
+        .nav-link {
+            color: var(--background) !important;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--accent) !important;
+        }
+
+        /* Zellige Pattern */
+        .zellige-border {
+            background-image: 
+                linear-gradient(45deg, var(--primary) 25%, transparent 25%),
+                linear-gradient(-45deg, var(--primary) 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, var(--primary) 75%),
+                linear-gradient(-45deg, transparent 75%, var(--primary) 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            height: 8px;
+        }
+
+        /* Cards */
+        .dish-card {
+            background: var(--card-bg);
+            border: none;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s ease;
+        }
+
+        .dish-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(156, 66, 33, 0.2);
+        }
+
+        .dish-card img {
+            height: 220px;
+            object-fit: cover;
+        }
+
+        .dish-price {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: #7A3419;
+            border-color: #7A3419;
+        }
+
+        .btn-accent {
+            background: var(--accent);
+            color: var(--text-primary);
+            border: none;
+            font-weight: 600;
+        }
+
+        .btn-accent:hover {
+            background: #C4A32D;
+            color: var(--text-primary);
+        }
+
+        /* Category Pills */
+        .category-pill {
+            background: var(--card-bg);
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            border-radius: 30px;
+            padding: 8px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .category-pill:hover, .category-pill.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, var(--text-primary) 0%, #1a0f0a 100%);
+            color: var(--background);
+        }
+
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        /* Status Badges */
+        .badge-pending { background-color: #ffc107; color: #000; }
+        .badge-preparing { background-color: #17a2b8; color: #fff; }
+        .badge-ready { background-color: #28a745; color: #fff; }
+        .badge-served { background-color: #6f42c1; color: #fff; }
+        .badge-paid { background-color: #6c757d; color: #fff; }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, rgba(156, 66, 33, 0.9) 0%, rgba(93, 138, 168, 0.8) 100%),
+                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="10" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            padding: 100px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23D4AF37' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+
+        /* Cart badge */
+        .cart-badge {
+            position: relative;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--accent);
+            color: var(--text-primary);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .animate-delay-1 { animation-delay: 0.1s; }
+        .animate-delay-2 { animation-delay: 0.2s; }
+        .animate-delay-3 { animation-delay: 0.3s; }
+
+        /* Table Selection */
+        .table-number {
+            width: 60px;
+            height: 60px;
+            border: 3px solid var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .table-number:hover, .table-number.selected {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Order Status Timeline */
+        .status-timeline {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+
+        .status-step {
+            text-align: center;
+            flex: 1;
+            position: relative;
+        }
+
+        .status-step::after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            width: 100%;
+            height: 3px;
+            background: #ddd;
+            z-index: -1;
+        }
+
+        .status-step:last-child::after {
+            display: none;
+        }
+
+        .status-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+        }
+
+        .status-step.active .status-icon {
+            background: var(--primary);
+            color: white;
+        }
+
+        .status-step.completed .status-icon {
+            background: var(--accent);
+            color: var(--text-primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 60px 0;
+            }
+            
+            .dish-card img {
+                height: 180px;
+            }
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <i class="bi bi-cup-hot-fill"></i> Mama's Mina
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home' %}">
+                            <i class="bi bi-house-door"></i> Accueil
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'menu' %}">
+                            <i class="bi bi-menu-button-wide"></i> Menu
+                        </a>
+                    </li>
+                    <li class="nav-item cart-badge">
+                        <a class="nav-link" href="{% url 'cart' %}">
+                            <i class="bi bi-cart3"></i> Panier
+                            <span class="cart-count" id="cartCount">0</span>
+                        </a>
+                    </li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'dashboard' %}">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'account_login' %}">
+                            <i class="bi bi-person-lock"></i> Personnel
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Zellige Divider -->
+    <div class="zellige-border"></div>
+
+    <!-- Footer -->
+    <footer class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <h4 class="logo-text mb-3">Mama's Mina</h4>
+                    <p>Découvrez l'authenticité de la cuisine marocaine dans un cadre élégant et chaleureux.</p>
+                    <div class="mt-3">
+                        <a href="#" class="me-3"><i class="bi bi-instagram fs-4"></i></a>
+                        <a href="#" class="me-3"><i class="bi bi-facebook fs-4"></i></a>
+                        <a href="#"><i class="bi bi-whatsapp fs-4"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <h5>Liens Rapides</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'menu' %}">Notre Menu</a></li>
+                        <li><a href="{% url 'cart' %}">Commander</a></li>
+                        <li><a href="#">À Propos</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <h5>Contact</h5>
+                    <p><i class="bi bi-geo-alt"></i> Marrakech, Maroc</p>
+                    <p><i class="bi bi-telephone"></i> +212 6XX XXX XXX</p>
+                    <p><i class="bi bi-envelope"></i> contact@mamas-mina.ma</p>
+                </div>
+            </div>
+            <hr style="border-color: var(--accent);">
+            <div class="text-center">
+                <p class="mb-0">&copy; 2024 Mama's Mina. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Cart functionality
+        function getCart() {
+            const cart = localStorage.getItem('mamasMinaCart');
+            return cart ? JSON.parse(cart) : [];
+        }
+
+        function updateCartCount() {
+            const cart = getCart();
+            const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cartCount').textContent = count;
+        }
+
+        function addToCart(dishId, dishName, price) {
+            const cart = getCart();
+            const existingItem = cart.find(item => item.id === dishId);
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ id: dishId, name: dishName, price: price, quantity: 1 });
+            }
+            
+            localStorage.setItem('mamasMinaCart', JSON.stringify(cart));
+            updateCartCount();
+            
+            // Show toast notification
+            showToast(`${dishName} ajouté au panier!`);
+        }
+
+        function removeFromCart(dishId) {
+            let cart = getCart();
+            cart = cart.filter(item => item.id !== dishId);
+            localStorage.setItem('mamasMinaCart', JSON.stringify(cart));
+            updateCartCount();
+            location.reload();
+        }
+
+        function updateQuantity(dishId, change) {
+            const cart = getCart();
+            const item = cart.find(i => i.id === dishId);
+            
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) {
+                    removeFromCart(dishId);
+                } else {
+                    localStorage.setItem('mamasMinaCart', JSON.stringify(cart));
+                    updateCartCount();
+                    location.reload();
+                }
+            }
+        }
+
+        function getCartTotal() {
+            const cart = getCart();
+            return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'position-fixed bottom-0 end-0 p-3';
+            toast.innerHTML = `
+                <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header" style="background: var(--primary); color: white;">
+                        <strong class="me-auto">Mama's Mina</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+                    </div>
+                    <div class="toast-body" style="background: var(--card-bg);">
+                        ${message}
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Initialize cart count on page load
+        document.addEventListener('DOMContentLoaded', updateCartCount);
+        
+        // Add to cart button handlers (using data attributes)
+        document.addEventListener('click', function(e) {
+            const button = e.target.closest('.add-to-cart-btn');
+            if (button) {
+                const dishId = button.getAttribute('data-dish-id');
+                const dishName = button.getAttribute('data-dish-name');
+                const price = parseFloat(button.getAttribute('data-dish-price'));
+                addToCart(dishId, dishName, price);
+            }
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

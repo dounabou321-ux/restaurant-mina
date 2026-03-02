@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+
+{% block title %}Paiement - Mama's Mina{% endblock %}
+
+{% block content %}
+<div class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold" style="color: var(--primary);">
+                <i class="bi bi-credit-card"></i> Finaliser la Commande
+            </h1>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <!-- Table Selection -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Numéro de table</label>
+                            <div class="d-flex flex-wrap gap-3 mt-2" id="tableNumbers">
+                                {% for i in "1234567890"|make_list %}
+                                <div class="table-number" data-table="{{ forloop.counter }}">{{ forloop.counter }}</div>
+                                {% endfor %}
+                            </div>
+                            <input type="hidden" id="selectedTable" name="table_number" required>
+                        </div>
+
+                        <!-- Special Instructions -->
+                        <div class="mb-4">
+                            <label class="form-label">Instructions spéciales</label>
+                            <textarea class="form-control" name="special_instructions" rows="3" 
+                                placeholder="Allergies, préférences, etc."></textarea>
+                        </div>
+
+                        <!-- Order Summary -->
+                        <div class="mb-4">
+                            <h5 class="mb-3">Résumé de la commande</h5>
+                            <div id="orderSummary"></div>
+                        </div>
+
+                        <!-- Payment Simulation -->
+                        <div class="mb-4">
+                            <h5 class="mb-3">Paiement</h5>
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle"></i> 
+                                Simulation de paiement - Aucun montant réel ne sera débité
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded">
+                                <span class="fw-bold">Total à payer</span>
+                                <span class="fw-bold" id="paymentTotal" style="color: var(--primary); font-size: 1.5rem;">0.00 MAD</span>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-accent w-100 py-3" id="payBtn" disabled>
+                            <i class="bi bi-lock"></i> Payer et Commander
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function loadOrderSummary() {
+    const cart = getCart();
+    const container = document.getElementById('orderSummary');
+    const totalEl = document.getElementById('paymentTotal');
+    
+    if (cart.length === 0) {
+        container.innerHTML = '<p class="text-muted">Votre panier est vide</p>';
+        return;
+    }
+    
+    let html = '<ul class="list-group mb-3">';
+    let total = 0;
+    
+    cart.forEach(item => {
+        const itemTotal = item.price * item.quantity;
+        total += itemTotal;
+        html += `
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>${item.name} x${item.quantity}</span>
+                <span>${itemTotal.toFixed(2)} MAD</span>
+            </li>
+        `;
+    });
+    
+    const tax = total * 0.1;
+    const grandTotal = total + tax;
+    
+    html += `
+        <li class="list-group-item d-flex justify-content-between">
+            <span>Sous-total</span>
+            <span>${total.toFixed(2)} MAD</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between">
+            <span>TVA (10%)</span>
+            <span>${tax.toFixed(2)} MAD</span>
+        </li>
+    </ul>`;
+    
+    container.innerHTML = html;
+    totalEl.textContent = grandTotal.toFixed(2) + ' MAD';
+    
+    return grandTotal;
+}
+
+// Table selection
+document.querySelectorAll('.table-number').forEach(el => {
+    el.addEventListener('click', function() {
+        document.querySelectorAll('.table-number').forEach(e => e.classList.remove('selected'));
+        this.classList.add('selected');
+        document.getElementById('selectedTable').value = this.getAttribute('data-table');
+        document.getElementById('payBtn').disabled = false;
+    });
+});
+
+// Payment
+document.getElementById('payBtn').addEventListener('click', function() {
+    const tableNumber = document.getElementById('selectedTable').value;
+    const cart = getCart();
+    const instructions = document.querySelector('textarea[name="special_instructions"]').value;
+    
+    if (!tableNumber) {
+        alert('Veuillez sélectionner votre numéro de table');
+        return;
+    }
+    
+    if (cart.length === 0) {
+        alert('Votre panier est vide');
+        return;
+    }
+    
+    // Show loading
+    this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Traitement en cours...';
+    this.disabled = true;
+    
+    // Simulate payment
+    setTimeout(function() {
+        fetch('{% url "checkout" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                table_number: tableNumber,
+                items: cart,
+                special_instructions: instructions
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Clear cart
+                localStorage.removeItem('mamasMinaCart');
+                updateCartCount();
+                // Redirect to confirmation
+                window.location.href = '/order/' + data.order_id + '/';
+            } else {
+                alert('Erreur: ' + data.error);
+                location.reload();
+            }
+        })
+        .catch(error => {
+            alert('Erreur de connexion');
+            location.reload();
+        });
+    }, 2000);
+});
+
+document.addEventListener('DOMContentLoaded', loadOrderSummary);
+</script>
+{% endblock %}

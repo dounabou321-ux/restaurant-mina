@@ -1,0 +1,90 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block title %}Gestion du Menu - Dashboard{% endblock %}
+
+{% block dashboard_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">Gestion du Menu</h2>
+    <div>
+        <a href="{% url 'add_category' %}" class="btn btn-outline-primary me-2">
+            <i class="bi bi-folder-plus"></i> Nouvelle Catégorie
+        </a>
+        <a href="{% url 'add_dish' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Nouveau Plat
+        </a>
+    </div>
+</div>
+
+<!-- Categories -->
+{% for category in categories %}
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">
+            <i class="bi bi-folder me-2" style="color: var(--primary);"></i>
+            {{ category.name }}
+        </h5>
+        <span class="badge bg-secondary">{{ category.dishes.count }} plats</span>
+    </div>
+    <div class="card-body">
+        {% if category.dishes %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Nom</th>
+                        <th>Description</th>
+                        <th>Prix</th>
+                        <th>Disponibilité</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for dish in category.dishes.all %}
+                    <tr>
+                        <td>
+                            {% if dish.image %}
+                            <img src="{{ dish.image.url }}" alt="{{ dish.name }}" style="width: 60px; height: 60px; object-fit: cover;" class="rounded">
+                            {% else %}
+                            <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                <i class="bi bi-image text-muted"></i>
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td><strong>{{ dish.name }}</strong></td>
+                        <td><small>{{ dish.description|truncatewords:10 }}</small></td>
+                        <td><strong>{{ dish.price }} MAD</strong></td>
+                        <td>
+                            {% if dish.is_available %}
+                            <span class="badge bg-success">Disponible</span>
+                            {% else %}
+                            <span class="badge bg-danger">Indisponible</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'edit_dish' dish.id %}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{% url 'delete_dish' dish.id %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce plat?')">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted text-center py-3">Aucun plat dans cette catégorie</p>
+        {% endif %}
+    </div>
+</div>
+{% empty %}
+<div class="text-center py-5">
+    <i class="bi bi-menu-button-wide display-1 text-muted"></i>
+    <h3 class="mt-3">Aucun menu</h3>
+    <p class="text-muted">Commencez par créer des catégories et des plats</p>
+    <a href="{% url 'add_category' %}" class="btn btn-primary mt-2">Créer une catégorie</a>
+</div>
+{% endfor %}
+{% endblock %}

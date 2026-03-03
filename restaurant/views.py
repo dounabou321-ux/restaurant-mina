@@ -1,11 +1,23 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.utils import timezone
 from .models import Category, Dish, Order
 import json
+
+
+def staff_required(view_func):
+    """Decorator to require staff status"""
+    def wrapper(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('account_login')
+        if not request.user.is_staff:
+            messages.error(request, "Accès réservé aux administrateurs.")
+            return redirect('home')
+        return view_func(request, *args, **kwargs)
+    return wrapper
 
 
 def home(request):
@@ -94,7 +106,7 @@ def order_confirmed(request, order_id):
     return render(request, 'core/order_confirmed.html', {'order': order})
 
 
-@login_required
+@staff_required
 def dashboard(request):
     """Staff dashboard view"""
     orders = Order.objects.all()[:50]
@@ -107,21 +119,21 @@ def dashboard(request):
     })
 
 
-@login_required
+@staff_required
 def menu_management(request):
     """Menu management view for staff"""
     categories = Category.objects.all().prefetch_related('dishes')
     return render(request, 'dashboard/menu_management.html', {'categories': categories})
 
 
-@login_required
+@staff_required
 def kitchen_view(request):
     """Kitchen view for preparing orders"""
     pending_orders = Order.objects.filter(status__in=['pending', 'preparing']).order_by('created_at')
     return render(request, 'dashboard/kitchen_view.html', {'orders': pending_orders})
 
 
-@login_required
+@staff_required
 @require_http_methods(["POST"])
 def update_order_status(request):
     """Update order status API"""
@@ -139,7 +151,7 @@ def update_order_status(request):
         return JsonResponse({'success': False, 'error': str(e)})
 
 
-@login_required
+@staff_required
 def add_dish(request):
     """Add new dish"""
     if request.method == 'POST':
@@ -163,7 +175,7 @@ def add_dish(request):
     return render(request, 'dashboard/add_dish.html', {'categories': categories})
 
 
-@login_required
+@staff_required
 def add_category(request):
     """Add new category"""
     if request.method == 'POST':
@@ -182,7 +194,7 @@ def add_category(request):
     return render(request, 'dashboard/add_category.html')
 
 
-@login_required
+@staff_required
 def edit_dish(request, dish_id):
     """Edit dish"""
     dish = get_object_or_404(Dish, id=dish_id)
@@ -201,7 +213,7 @@ def edit_dish(request, dish_id):
     return render(request, 'dashboard/edit_dish.html', {'dish': dish, 'categories': categories})
 
 
-@login_required
+@staff_required
 def delete_dish(request, dish_id):
     """Delete dish"""
     dish = get_object_or_404(Dish, id=dish_id)
@@ -210,7 +222,7 @@ def delete_dish(request, dish_id):
     return redirect('menu_management')
 
 
-@login_required
+@staff_required
 @require_http_methods(["POST"])
 def delete_order(request):
     """Delete order API"""

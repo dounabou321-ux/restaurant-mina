@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load allauth %}
+
+{% block extra_css %}
+<style>
+    .account-page {
+        min-height: calc(100vh - 72px);
+        display: flex;
+        align-items: center;
+        background: linear-gradient(135deg, rgba(156, 66, 33, 0.05) 0%, rgba(93, 138, 168, 0.05) 100%);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .account-page::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0  xmlns='http://60 60'www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C4221' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.5;
+    }
+
+    .logout-card {
+        background: var(--card-bg);
+        border-radius: 24px;
+        box-shadow: 0 20px 60px rgba(156, 66, 33, 0.15);
+        overflow: hidden;
+        position: relative;
+        z-index: 1;
+        max-width: 450px;
+    }
+
+    .logout-header {
+        background: linear-gradient(135deg, var(--primary) 0%, #7A3419 100%);
+        padding: 40px 40px 60px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .logout-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23D4AF37' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .logout-header h1 {
+        color: var(--accent);
+        font-family: 'Cinzel Decorative', cursive;
+        font-size: 2rem;
+        margin-bottom: 10px;
+        position: relative;
+    }
+
+    .logout-header p {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 1rem;
+        position: relative;
+    }
+
+    .logout-icon {
+        width: 80px;
+        height: 80px;
+        background: var(--card-bg);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: -60px auto 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        position: relative;
+        z-index: 2;
+    }
+
+    .logout-icon i {
+        font-size: 2.5rem;
+        color: var(--primary);
+    }
+
+    .logout-body {
+        padding: 20px 40px 40px;
+        text-align: center;
+    }
+
+    .logout-message {
+        color: var(--text-secondary);
+        margin-bottom: 25px;
+        font-size: 1.05rem;
+    }
+
+    .btn-logout {
+        background: linear-gradient(135deg, var(--primary) 0%, #7A3419 100%);
+        color: white;
+        border: none;
+        padding: 14px 30px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+
+    .btn-logout:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(156, 66, 33, 0.3);
+        color: white;
+    }
+
+    .btn-cancel {
+        background: transparent;
+        color: var(--text-secondary);
+        border: 2px solid var(--text-secondary);
+        padding: 12px 28px;
+        font-weight: 600;
+        font-size: 1rem;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-cancel:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+
+    .logout-divider {
+        display: flex;
+        align-items: center;
+        margin: 25px 0;
+    }
+
+    .logout-divider::before, .logout-divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--text-secondary), transparent);
+    }
+
+    .logout-divider span {
+        padding: 0 15px;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+
+    .zellige-corner {
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        opacity: 0.3;
+    }
+
+    .zellige-corner.top-right {
+        top: 10px;
+        right: 10px;
+        background: linear-gradient(135deg, var(--accent) 25%, transparent 25%),
+                    linear-gradient(225deg, var(--accent) 25%, transparent 25%),
+                    linear-gradient(45deg, var(--accent) 25%, transparent 25%),
+                    linear-gradient(315deg, var(--accent) 25%, transparent 25%);
+        background-size: 10px 10px;
+    }
+
+    .zellige-corner.bottom-left {
+        bottom: 10px;
+        left: 10px;
+        background: linear-gradient(135deg, var(--accent) 25%, transparent 25%),
+                    linear-gradient(225deg, var(--accent) 25%, transparent 25%),
+                    linear-gradient(45deg, var(--accent) 25%, transparent 25%),
+                    linear-gradient(315deg, var(--accent) 25%, transparent 25%);
+        background-size: 10px 10px;
+    }
+
+    .form-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="account-page py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5 col-lg-4">
+                <div class="logout-card">
+                    <div class="zellige-corner top-right"></div>
+                    <div class="zellige-corner bottom-left"></div>
+                    
+                    <div class="logout-header">
+                        <h1><i class="bi bi-cup-hot-fill me-2"></i>Mama's Mina</h1>
+                        <p>{% trans "Déconnexion" %}</p>
+                    </div>
+                    
+                    <div class="logout-icon">
+                        <i class="bi bi-box-arrow-right"></i>
+                    </div>
+                    
+                    <div class="logout-body">
+                        <p class="logout-message">
+                            {% trans "Êtes-vous sûr de vouloir vous déconnecter?" %}
+                        </p>
+                        
+                        <form method="post" action="{% url 'account_logout' %}">
+                            {% csrf_token %}
+                            {% if redirect_field_value %}
+                            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+                            {% endif %}
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-logout">
+                                    <i class="bi bi-box-arrow-right me-2"></i>
+                                    {% trans "Se Déconnecter" %}
+                                </button>
+                            </div>
+                        </form>
+                        
+                        <div class="logout-divider">
+                            <span>🍽️</span>
+                        </div>
+                        
+                        <div class="text-center">
+                            <a href="{% url 'dashboard' %}" class="btn-cancel">
+                                <i class="bi bi-arrow-left"></i>
+                                {% trans "Annuler" %}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -291,6 +291,24 @@
             color: var(--text-primary);
         }
 
+        /* Logo Image Styles */
+        .logo-img {
+            height: 32px;
+            width: auto;
+        }
+        .logo-footer {
+            height: 40px;
+            width: auto;
+        }
+        .hero-logo {
+            height: 60px;
+            width: auto;
+        }
+        .logout-logo {
+            height: 28px;
+            width: auto;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .hero-section {
@@ -300,6 +318,10 @@
             .dish-card img {
                 height: 180px;
             }
+            .logo-img { height: 28px; }
+            .logo-footer { height: 36px; }
+            .hero-logo { height: 50px; }
+            .logout-logo { height: 24px; }
         }
     </style>
     
@@ -310,7 +332,8 @@
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
         <div class="container">
             <a class="navbar-brand" href="{% url 'home' %}">
-                <i class="bi bi-cup-hot-fill"></i> Mama's Mina
+                <img src="{% static 'images/logo.png' %}" alt="Mama's Mina" class="logo-img me-2">
+                Mama's Mina
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -364,6 +387,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-4 mb-4">
+                    <img src="{% static 'images/logo.png' %}" alt="Mama's Mina" class="logo-footer mb-3">
                     <h4 class="logo-text mb-3">Mama's Mina</h4>
                     <p>Découvrez l'authenticité de la cuisine marocaine dans un cadre élégant et chaleureux.</p>
                     <div class="mt-3">
